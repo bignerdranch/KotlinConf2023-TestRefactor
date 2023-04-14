@@ -6,12 +6,14 @@ import receipts.ReceiptDisplay
 class PointOfSale(
     private val productsManager: ProductsManager,
     private val receiptDisplay: ReceiptDisplay,
+    private val screenOutput: ScreenOutput,
+    private val presenter: PointOfSaleOutputPresenter,
 ) {
     private var transaction = Transaction(emptyList())
 
     fun showAvailableItems() {
-        productsManager.getAllProducts().joinToString("\n") { "${it.uid} - ${it.name} | ${it.price}" }
-            .also { println(it) }
+        presenter.formatProductsForOutput(productsManager.getAllProducts())
+            .also { screenOutput.print(it) }
     }
 
     fun addItemToTransaction(id: String) {
@@ -24,9 +26,9 @@ class PointOfSale(
 
     private fun showTransaction() {
         for (product in transaction.products) {
-            println("${product.name} | ${product.price}")
+            screenOutput.print("${product.name} | ${product.price}")
         }
-        println("Total ${transaction.total}")
+        screenOutput.print("Total ${transaction.total}")
     }
 
     fun printReceipt() {
